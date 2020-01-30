@@ -34,14 +34,17 @@ public class GridType<T> {
         return t;
     }
 
+    //will copy a region and will wrap using a toroidial configuration to copy elements out of range. Does so by finding (index + size) % size
     public GridType<T> DeepCopyRegion(int x1, int y1, int x2, int y2) {
         GridType<T> t = new GridType<T>(x2 - x1, y2 - y1);
         int regIterX = 0;
         int regIterY = 0;
+        int w = width;
+        int h = height;
 
         for(int j = y2-y1; j <= y2; j++) {
             for(int i = x2-x1; i <= x2; i++) {
-                t[regIterX++, regIterY++] = this[i, j];
+                t[regIterX++, regIterY++] = this[(i + w) % w, (j + h) % h];
             }
         }
 
