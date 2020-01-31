@@ -140,9 +140,7 @@ public class GoL_logic : MonoBehaviour
     }
 
     void OnRenderObject() {
-        GL.PushMatrix();
         Graphics.DrawTexture(new Rect(0, 0, 1, 1), tex);
-        GL.PopMatrix();
     }
 
 }
