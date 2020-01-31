@@ -43,12 +43,10 @@ public class GridType<T> {
         int h = height;
 
         for(int j = y1; j <= y2; j++) {
-            for(int i = x1; i <= x2; i++) {
-                temp[regIterX, regIterY] = this[(i + w) % w, (j + h) % h];
-                regIterX++;
-            }
             regIterX = 0;
-            regIterY++;
+            for(int i = x1; i <= x2; i++) {
+                temp[regIterX++, regIterY] = this[(i + w) % w, (j + h) % h];
+            } regIterY++;
         }
 
         return temp;

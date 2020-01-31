@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,9 +33,6 @@ public class GoL_logic : MonoBehaviour
     public int GetGameRegionSum(int x1, int y1, int x2, int y2) {
         GridType<int> region = GetGameRegion( x1, y1, x2, y2);
 
-        Debug.Log("Width: " + region.Width().ToString());
-        Debug.Log("Height: " + region.Height().ToString());
-
         int sum = 0;
 
         for(int j = 0; j < region.Height(); j++) {
@@ -61,15 +59,13 @@ public class GoL_logic : MonoBehaviour
         if ( should_cull )
             sum -= game_board[x, y] ? 1 : 0;
 
+        if ( CheckGrowth(sum) ) 
+            return true;
 
-        if ( CheckStability(sum) ) {
-            if ( CheckGrowth(sum) ) {
-                return true;
-            }
+        if ( CheckStability(sum) )
             return game_board[x, y];
-        } else {
-            return false;
-        }
+
+        return false;
     }
 
     //Mutate game_board to store the next state for all game board cells.
@@ -84,6 +80,7 @@ public class GoL_logic : MonoBehaviour
         }
 
         game_board = next_board;
+        next_board = new BitGridType(next_board.Width(), next_board.Height());
     }
 
 
@@ -119,7 +116,7 @@ public class GoL_logic : MonoBehaviour
             var colW = new Color32(255,255,255,255);
             var colB = new Color32(0,0,0,255);
 
-            currentColor[i] = game_board[i / w, i % h] ? colW : colB;
+            currentColor[i] = game_board[i % w, i / h] ? colW : colB;
 
         }
         tex.Apply();
@@ -128,6 +125,8 @@ public class GoL_logic : MonoBehaviour
     void Awake() {
         Populate();
         tex = new Texture2D(game_board.Width(), game_board.Height(), TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+
     }
     // Start is called before the first frame update
     void Start() {
