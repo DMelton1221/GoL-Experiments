@@ -18,11 +18,11 @@ public class GridType<T> {
         board = new T[width, height];
     }
 
-    public GridType<T> ShallowCopy() {
+    virtual public GridType<T> ShallowCopy() {
         return (GridType<T>) this.MemberwiseClone();
     }
 
-    public GridType<T> DeepCopy() {
+    virtual public GridType<T> DeepCopy() {
         GridType<T> t = new GridType<T>(width, height);
 
         for(int j = 0; j < height; j++) {
@@ -36,19 +36,20 @@ public class GridType<T> {
 
     //will copy a region and will wrap using a toroidial configuration to copy elements out of range. Does so by finding (index + size) % size
     public GridType<T> DeepCopyRegion(int x1, int y1, int x2, int y2) {
-        GridType<T> t = new GridType<T>(x2 - x1, y2 - y1);
+        GridType<T> temp = new GridType<T>(x2 - x1 + 1, y2 - y1 + 1);
         int regIterX = 0;
         int regIterY = 0;
         int w = width;
         int h = height;
 
-        for(int j = y2-y1; j <= y2; j++) {
-            for(int i = x2-x1; i <= x2; i++) {
-                t[regIterX++, regIterY++] = this[(i + w) % w, (j + h) % h];
-            }
+        for(int j = y1; j <= y2; j++) {
+            regIterX = 0;
+            for(int i = x1; i <= x2; i++) {
+                temp[regIterX++, regIterY] = this[(i + w) % w, (j + h) % h];
+            } regIterY++;
         }
 
-        return t;
+        return temp;
     }
 
     public int Width() {

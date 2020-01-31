@@ -1,9 +1,12 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GoL_logic : MonoBehaviour
 {
+
+    Texture2D tex;
 
     private BitGridType game_board;
     private BitGridType next_board;
@@ -14,7 +17,15 @@ public class GoL_logic : MonoBehaviour
 
     //Gets a section of the game region
     public GridType<int> GetGameRegion(int x1, int y1, int x2, int y2) {
-        GridType<int> region = (BitGridType) game_board.DeepCopyRegion(x1, y1, x2, y2);
+        var region_temp = game_board.DeepCopyRegion(x1, y1, x2, y2);
+        var region = new GridType<int>(region_temp.Width(), region_temp.Height());
+
+        for(int j = 0; j < region_temp.Height(); j++ ) {
+            for( int i = 0; i < region_temp.Width(); i++ ) {
+                region[i, j] = region_temp[i, j] ? 1 : 0;
+            }
+        }
+
         return region;
     }
 
@@ -48,14 +59,13 @@ public class GoL_logic : MonoBehaviour
         if ( should_cull )
             sum -= game_board[x, y] ? 1 : 0;
 
-        if ( this.CheckStability(sum) ) {
-            if ( this.CheckGrowth(sum) ) {
-                return true;
-            }
+        if ( CheckGrowth(sum) ) 
+            return true;
+
+        if ( CheckStability(sum) )
             return game_board[x, y];
-        } else {
-            return false;
-        }
+
+        return false;
     }
 
     //Mutate game_board to store the next state for all game board cells.
@@ -70,6 +80,7 @@ public class GoL_logic : MonoBehaviour
         }
 
         game_board = next_board;
+        next_board = new BitGridType(next_board.Width(), next_board.Height());
     }
 
 
@@ -95,18 +106,43 @@ public class GoL_logic : MonoBehaviour
         should_cull = true;
     }
 
+    public void RenderBoard() {
+        var currentColor = this.tex.GetRawTextureData<Color32>();
 
+        for(int i = 0; i < tex.width * tex.height; i++ ) {
+            int w = game_board.Width();
+            int h = game_board.Height();
+
+            var colW = new Color32(255,255,255,255);
+            var colB = new Color32(0,0,0,255);
+
+            currentColor[i] = game_board[i % w, i / h] ? colW : colB;
+
+        }
+        tex.Apply();
+    }
 
     void Awake() {
-        this.Populate();
+        Populate();
+        tex = new Texture2D(game_board.Width(), game_board.Height(), TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+
     }
     // Start is called before the first frame update
     void Start() {
-        
+        RenderBoard();
     }
 
     // Update is called once per frame
     void Update() {
-        this.NextBoardState();
+        NextBoardState();
+        RenderBoard();
     }
+
+    void OnRenderObject() {
+        GL.PushMatrix();
+        Graphics.DrawTexture(new Rect(0, 0, 1, 1), tex);
+        GL.PopMatrix();
+    }
+
 }
