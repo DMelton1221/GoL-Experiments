@@ -55,6 +55,7 @@
   <ItemGroup>
      <Compile Include="Assets\BitGridType.cs" />
      <Compile Include="Assets\GoL_logic.cs" />
+     <Compile Include="Assets\GoLHeightMap.cs" />
      <Compile Include="Assets\GridType.cs" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>C:/Users/Derrick/GoL-Experiments/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>

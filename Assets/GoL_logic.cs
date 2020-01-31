@@ -3,10 +3,8 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoL_logic : MonoBehaviour
+public class GoL_logic
 {
-
-    Texture2D tex;
 
     private BitGridType game_board;
     private BitGridType next_board;
@@ -28,6 +26,11 @@ public class GoL_logic : MonoBehaviour
 
         return region;
     }
+
+    public BitGridType GetBoard() {
+        return game_board;
+    }
+
 
     //Gets the sum of the values in a game region
     public int GetGameRegionSum(int x1, int y1, int x2, int y2) {
@@ -69,7 +72,7 @@ public class GoL_logic : MonoBehaviour
     }
 
     //Mutate game_board to store the next state for all game board cells.
-    void NextBoardState() {
+    public void NextBoardState() {
         int w = game_board.Width();
         int h = game_board.Height();
 
@@ -85,7 +88,7 @@ public class GoL_logic : MonoBehaviour
 
 
     //Populate the game board with random noise.
-    void Populate() {
+    public void Populate() {
         int w = game_board.Width();
         int h = game_board.Height();
 
@@ -97,50 +100,17 @@ public class GoL_logic : MonoBehaviour
     }
 
 
-    //For now, we will just test with a hard coded state;
-    public GoL_logic() {
-        game_board = new BitGridType(100,100);
-        next_board = new BitGridType(100,100);
-        population_stable = new int[]{2,3};
-        population_grow = new int[]{3,3};
-        should_cull = true;
+    public GoL_logic(int width, int height, int[] stability_range, int[] growth_range, bool only_test_neighbors) {
+        game_board = new BitGridType(width, height);
+        next_board = new BitGridType(width, height);
+        population_stable = stability_range;
+        population_grow = growth_range;
+        should_cull = only_test_neighbors;
     }
 
-    public void RenderBoard() {
-        var currentColor = this.tex.GetRawTextureData<Color32>();
+    //Default constructor creates Life with the standard ruleset and a 100 by 100 game board;
+    public GoL_logic() : this(100,100, new int[]{2,3}, new int[]{3,3}, true) {}
 
-        for(int i = 0; i < tex.width * tex.height; i++ ) {
-            int w = game_board.Width();
-            int h = game_board.Height();
-
-            var colW = new Color32(255,255,255,255);
-            var colB = new Color32(0,0,0,255);
-
-            currentColor[i] = game_board[i % w, i / h] ? colW : colB;
-
-        }
-        tex.Apply();
-    }
-
-    void Awake() {
-        Populate();
-        tex = new Texture2D(game_board.Width(), game_board.Height(), TextureFormat.RGBA32, false);
-        tex.filterMode = FilterMode.Point;
-
-    }
-    // Start is called before the first frame update
-    void Start() {
-        RenderBoard();
-    }
-
-    // Update is called once per frame
-    void Update() {
-        NextBoardState();
-        RenderBoard();
-    }
-
-    void OnRenderObject() {
-        Graphics.DrawTexture(new Rect(0, 0, 1, 1), tex);
-    }
-
+    //Creates a Life simulation with custom dimensions;
+    public GoL_logic(int width, int height) : this(width, height, new int[]{2,3}, new int[]{3,3}, true) {}
 }
