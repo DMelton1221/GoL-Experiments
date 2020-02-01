@@ -6,7 +6,7 @@ using UnityEngine;
 public class GoL_logic
 {
 
-    private BitGridType game_board;
+    public BitGridType game_board;
     private BitGridType next_board;
 
     private int[] population_stable;

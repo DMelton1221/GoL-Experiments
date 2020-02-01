@@ -53,6 +53,28 @@ public class GoLHeightMap : MonoBehaviour
         }
     }
 
+    public GridType<int> SumBoards(GridType<int> heightMap) {
+        var h = heightMap.Height();
+        var w = heightMap.Width();
+        for(int j = 0; j < h; j++ ) {
+            for(int i = 0; i < w;  i++) {
+                heightMap[i, j] += game.GetBoard()[i, j] ? 1 : 0;
+            }
+        }
+
+        return heightMap;
+    }
+
+    public BitGridType UnionSteps(int iter) {
+        BitGridType region  = new BitGridType(game.GetBoard().Width(), game.GetBoard().Height());
+        for(int i = 0; i < iter;  i++) {
+            game.NextBoardState();
+            region |= game.GetBoard();
+        }
+
+        return region;
+    }
+
     void Awake() {
         game.Populate();
         texBoard = new Texture2D(game.GetBoard().Width(), game.GetBoard().Height(), TextureFormat.RGBA32, false);
@@ -68,10 +90,14 @@ public class GoLHeightMap : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-        game.NextBoardState();
+        var w = game.game_board.Width();
+        var h = game.game_board.Height();
+        var sum = game.GetGameRegionSum(0,0,w-1, h-1);
+        game.game_board = UnionSteps(2);
         RenderBoard();
         SumBoards();
         RenderHeightMap();
+        Debug.Log((w*h/((float)sum)).ToString());
     }
 
     void OnRenderObject() {
