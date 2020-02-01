@@ -9,10 +9,12 @@ public class GoLHeightMap : MonoBehaviour
     private Texture2D texMap;
     private GridType<int> heightMap;
     private GoL_logic game;
+    private HashSet<float> means;
 
     GoLHeightMap() {
         game = new GoL_logic();
         heightMap = new GridType<int>(game.GetBoard().Width(), game.GetBoard().Height());
+        means = new HashSet<float>();
     }
 
 
@@ -93,11 +95,17 @@ public class GoLHeightMap : MonoBehaviour
         var w = game.game_board.Width();
         var h = game.game_board.Height();
         var sum = game.GetGameRegionSum(0,0,w-1, h-1);
+        var mean = (w*h/((float)sum));
         game.game_board = UnionSteps(2);
         RenderBoard();
         SumBoards();
         RenderHeightMap();
-        Debug.Log((w*h/((float)sum)).ToString());
+
+        if (!means.Contains(mean)) {
+            means.Add(mean);
+            Debug.Log(mean.ToString());
+            Debug.Log(means.Count);
+        }
     }
 
     void OnRenderObject() {
